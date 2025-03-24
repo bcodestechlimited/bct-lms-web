@@ -9,11 +9,9 @@ import {
   CardTitle,
 } from "./ui/card";
 import { Progress } from "./ui/progress";
-import { useAuthStore } from "@/store/auth.store";
 import { Link } from "react-router";
 
 export function CourseCard({ course }: { course: Course }) {
-  const { user } = useAuthStore();
 
   return (
     <Card className="flex flex-col justify-between">
