@@ -1,0 +1,12 @@
+#root {
+  max-width: 2560px;
+  margin: 0 auto;
+}
+
+iframe {
+  border-radius: 6px;
+  height: 400px;
+  max-height: 600px;
+  width: 100%;
+  /* max-width: 800px; */
+}
