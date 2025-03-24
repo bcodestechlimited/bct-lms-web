@@ -7,14 +7,13 @@ import {
 import Loader from "@/components/loading-spinner";
 import { courseService } from "@/services/course.service";
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import { useEffect, useState } from "react";
 import { Lesson, Module } from "@/interfaces/course.interface";
 import { cn } from "@/lib/utils";
 
 export default function CourseDetail() {
   const { courseId } = useParams();
-  const navigate = useNavigate();
 
   console.log(courseId);
 
