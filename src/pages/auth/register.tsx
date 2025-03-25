@@ -52,7 +52,7 @@ export default function RegisterPage() {
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader>
           <CardTitle className="text-center text-lg font-semibold">
-            Admin Register
+            Register
           </CardTitle>
         </CardHeader>
         <CardContent>
