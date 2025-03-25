@@ -10,6 +10,9 @@ class AuthService {
         email: payload.email,
         password: payload.password,
       });
+
+      console.log({ data });
+
       const user = data.responseObject.user;
 
       // if (user?.role !== "user") {
