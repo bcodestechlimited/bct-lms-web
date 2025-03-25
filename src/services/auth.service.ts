@@ -35,6 +35,7 @@ class AuthService {
       const loginData = await this.login(payload);
       return loginData;
     } catch (error) {
+      console.log(error);
       throw error;
     }
   }
