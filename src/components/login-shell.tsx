@@ -43,8 +43,8 @@ export function LoginForm() {
         navigate(`/dashboard`);
         return `Welcome back ${firstName}`;
       },
-      error: () => {
-        return "Login failed, invalid credentials.";
+      error: (error) => {
+        return error;
       },
     });
   }

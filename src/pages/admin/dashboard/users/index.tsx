@@ -6,24 +6,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import { User } from "@/interfaces/user.interface";
 import { userService } from "@/services/user.service";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { EllipsisVertical } from "lucide-react";
 import { useState } from "react";
-import { SearchableDropdown } from "@/components/searchable-dropdown";
-import { courseService } from "@/services/course.service";
-import { Course } from "@/interfaces/course.interface";
-import { toast } from "sonner";
-import { AxiosError } from "axios";
+import AssignCourseModal from "./modals/assign-course-modal";
+import ConfirmActionModal from "./modals/confirmation-action-modal";
 
 export default function Users() {
   const { data: users, isLoading } = useQuery({
@@ -33,15 +22,35 @@ export default function Users() {
 
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [actionType, setActionType] = useState<
+    "activate" | "deactivate" | null
+  >(null);
 
   const handleAssignCourse = (user: User) => {
     setSelectedUser(user);
     setIsModalOpen(true);
   };
 
+  const handleConfirmAction = (user: User, type: "activate" | "deactivate") => {
+    console.log(type);
+    setSelectedUser(user);
+    setActionType(type);
+    setIsConfirmModalOpen(true);
+  };
+
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedUser(null);
+  };
+
+  const closeConfirmationModal = () => {
+    setIsConfirmModalOpen(false);
+    setSelectedUser(null);
+  };
+
+  const handleChangeActionType = (type: "activate" | "deactivate") => {
+    setActionType(type);
   };
 
   const columns = [
@@ -58,6 +67,20 @@ export default function Users() {
       render: (row: User) => row.email || "N/A",
     },
     {
+      header: "Status",
+      render: (row: User) => (
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-semibold ${
+            row.isActive
+              ? "bg-green-100 text-green-800"
+              : "bg-red-100 text-red-800"
+          }`}
+        >
+          {row.isActive ? "Active" : "Inactive"}
+        </span>
+      ),
+    },
+    {
       header: "Actions",
       render: (row: User) => (
         <DropdownMenu>
@@ -71,8 +94,22 @@ export default function Users() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem onClick={() => handleAssignCourse(row)}>
+            <DropdownMenuItem
+              className=" cursor-pointer hover:bg-gray-100"
+              onClick={() => handleAssignCourse(row)}
+            >
               Assign Course
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className=" text-red-500 cursor-pointer hover:bg-gray-100"
+              onClick={() =>
+                handleConfirmAction(
+                  row,
+                  row.isActive ? "deactivate" : "activate"
+                )
+              }
+            >
+              {row.isActive ? "Deactivate" : "Activate"} User
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -93,105 +130,14 @@ export default function Users() {
         onClose={closeModal}
         user={selectedUser}
       />
+
+      <ConfirmActionModal
+        isOpen={isConfirmModalOpen}
+        onClose={closeConfirmationModal}
+        user={selectedUser}
+        actionType={actionType}
+        changeActionType={handleChangeActionType}
+      />
     </div>
-  );
-}
-
-interface AssignCourseModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  user: User | null;
-}
-
-function AssignCourseModal({ isOpen, onClose, user }: AssignCourseModalProps) {
-  const [selectedCourse, setSelectedCourse] = useState<string>("");
-  const transformedCourses = async (value: string) => {
-    const courses = await courseService.getAllCourses({ search: value });
-    return courses.map((course: Course) => ({
-      value: course._id,
-      label: course.course_title,
-    }));
-  };
-
-  const assignCourseMutation = useMutation({
-    mutationFn: courseService.assignCourseToStudent,
-  });
-
-  const handleAssignCourse = async () => {
-    if (!selectedCourse) {
-      return toast.error("Please select a course");
-    }
-
-    if (!user || !user._id) {
-      return toast.error("Please select a user");
-    }
-
-    console.log(
-      `Course: ${selectedCourse} assigned to ${user?.firstName} with id:${user?._id}`
-    );
-
-    toast.promise(
-      () =>
-        assignCourseMutation.mutateAsync({
-          userId: user?._id || "",
-          courseId: selectedCourse,
-        }),
-      {
-        loading: "Assigning course...",
-        success: (data) => {
-          return data.message;
-        },
-        error: (error) => {
-          console.log({ error });
-          if (error instanceof AxiosError) {
-            return error.response?.data.message;
-          }
-          return "Failed to assign";
-        },
-      }
-    );
-  };
-
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Assign Course</DialogTitle>
-          <DialogDescription>
-            Assign a course to{" "}
-            <strong>
-              {user?.firstName} {user?.lastName}
-            </strong>
-            .
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-4">
-          {/* Add form elements here */}
-          <p>Select a course for {user?.email}.</p>
-          <form action="">
-            <SearchableDropdown
-              searchInputPlaceholder="Search for a course"
-              placeholder={"Select a course"}
-              fetchOptions={(value) => transformedCourses(value)}
-              onChange={(value) => {
-                console.log("Selected course:", value);
-                setSelectedCourse(value);
-              }}
-            />
-          </form>
-        </div>
-        <DialogFooter>
-          <Button onClick={onClose} variant="outline">
-            Cancel
-          </Button>
-          <Button
-            disabled={assignCourseMutation.isPending}
-            onClick={() => handleAssignCourse()}
-          >
-            Assign
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
   );
 }

@@ -5,5 +5,6 @@ export interface User {
   firstName?: string;
   lastName?: string;
   isEmailVerified?: boolean;
+  isActive: boolean;
   role: "user" | "admin";
 }

@@ -2,6 +2,7 @@
 import { LoginPayload, RegisterPayload } from "@/hooks/useAuth";
 import apiClient from "@/lib/api-client";
 import { useAuthStore } from "@/store/auth.store";
+import axios from "axios";
 
 class AuthService {
   async login(payload: LoginPayload) {
@@ -28,7 +29,14 @@ class AuthService {
 
       return data;
     } catch (error) {
-      throw error;
+      console.log(error);
+      if (axios.isAxiosError(error)) {
+        console.log(error.response?.data);
+        throw (
+          error.response?.data?.message || error.message || "An error occurred"
+        );
+      }
+      throw "An error occurred";
     }
   }
 
