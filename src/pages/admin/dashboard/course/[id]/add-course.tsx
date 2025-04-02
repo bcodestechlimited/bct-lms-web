@@ -75,6 +75,7 @@ export default function AddCoursePage() {
         <div>
           <label className="block font-medium">Course Description</label>
           <Textarea
+            className="min-h-40"
             {...register("course_description", {
               required: "Description is required",
             })}

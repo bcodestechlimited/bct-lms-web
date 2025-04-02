@@ -41,13 +41,17 @@ export default function AdminCoursePage() {
               <EllipsisVertical />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem>
-              <Link to={`/admin-dashboard/course/${row._id}`}>View</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link to={`/admin-dashboard/course/${row._id}/edit`}>Edit</Link>
-            </DropdownMenuItem>
+          <DropdownMenuContent align="end" className="w-fit">
+            <Link to={`/admin-dashboard/course/${row._id}`}>
+              <DropdownMenuItem className=" cursor-pointer">
+                View
+              </DropdownMenuItem>
+            </Link>
+            <Link to={`/admin-dashboard/course/${row._id}/edit`}>
+              <DropdownMenuItem className=" cursor-pointer">
+                Edit
+              </DropdownMenuItem>
+            </Link>
           </DropdownMenuContent>
         </DropdownMenu>
       ),
