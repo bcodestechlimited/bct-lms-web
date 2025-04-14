@@ -3,7 +3,6 @@ import axios, { AxiosError, AxiosInstance } from "axios";
 const apiClient: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   withCredentials: true,
-  timeout: 10000,
 });
 
 apiClient.interceptors.request.use(
