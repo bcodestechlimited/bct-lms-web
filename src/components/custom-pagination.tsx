@@ -7,43 +7,29 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { JSX, useEffect, useMemo } from "react";
+import { JSX, useMemo } from "react";
 import { useSearchParams } from "react-router";
 
 interface PaginationProps {
   pagination: {
-    totalCount: number;
-    filteredCount: number;
+    currentPage: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    pageSize: number;
+    total: number;
     totalPages: number;
-    limit: number;
-    page: number;
   };
 }
 
 export default function CustomPagination({ pagination }: PaginationProps) {
-  const { totalPages, page = 1, limit = 10 } = pagination;
+  const { totalPages } = pagination;
   const [searchParams, setSearchParams] = useSearchParams();
-
-  // Ensure URL params are only updated when necessary
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams);
-    let needsUpdate = false;
-
-    if (!params.has("page") || params.get("page") !== page.toString()) {
-      params.set("page", page.toString());
-      needsUpdate = true;
-    }
-    if (!params.has("limit") || params.get("limit") !== limit.toString()) {
-      params.set("limit", limit.toString());
-      needsUpdate = true;
-    }
-
-    if (needsUpdate) setSearchParams(params);
-  }, [page, limit, searchParams, setSearchParams]);
 
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
 
   const handlePageChange = (newPage: number) => {
+    console.log({ newPage });
+
     if (newPage < 1 || newPage > totalPages || newPage === currentPage) return;
     setSearchParams((prev: URLSearchParams) => {
       const params = new URLSearchParams(prev);
@@ -52,7 +38,6 @@ export default function CustomPagination({ pagination }: PaginationProps) {
     });
   };
 
-  // Memoize page number rendering
   const pageNumbers = useMemo(() => {
     const pages: JSX.Element[] = [];
     const maxVisiblePages = 5;

@@ -28,6 +28,7 @@ export default function AssignCourseModal({
   user,
 }: AssignCourseModalProps) {
   const [selectedCourse, setSelectedCourse] = useState<string>("");
+  const [IsUserAssigned, setIsUserAssigned] = useState(false);
   const transformedCourses = async (value: string) => {
     const courses = await courseService.getAllCourses({ search: value });
     return courses.map((course: Course) => ({
@@ -62,6 +63,7 @@ export default function AssignCourseModal({
       {
         loading: "Assigning course...",
         success: (data) => {
+          setIsUserAssigned(!IsUserAssigned);
           return data.message;
         },
         error: (error) => {
@@ -98,6 +100,14 @@ export default function AssignCourseModal({
               fetchOptions={(value) => transformedCourses(value)}
               onChange={(value) => {
                 console.log("Selected course:", value);
+                console.log("Selected User:", user);
+
+                if (user?.courses.includes(value)) {
+                  setIsUserAssigned(true);
+                } else {
+                  setIsUserAssigned(false);
+                }
+
                 setSelectedCourse(value);
               }}
             />
@@ -108,10 +118,11 @@ export default function AssignCourseModal({
             Cancel
           </Button>
           <Button
+            className={`${IsUserAssigned ? "bg-red-500 hover:bg-red-600" : ""}`}
             disabled={assignCourseMutation.isPending}
             onClick={() => handleAssignCourse()}
           >
-            Assign
+            {IsUserAssigned ? "Unassign Course" : "Assign Course"}
           </Button>
         </DialogFooter>
       </DialogContent>

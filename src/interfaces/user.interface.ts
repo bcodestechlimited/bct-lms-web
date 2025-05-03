@@ -6,5 +6,6 @@ export interface User {
   lastName?: string;
   isEmailVerified?: boolean;
   isActive: boolean;
+  courses: string[];
   role: "user" | "admin";
 }

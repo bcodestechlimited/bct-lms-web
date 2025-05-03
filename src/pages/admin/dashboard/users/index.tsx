@@ -13,19 +13,35 @@ import { EllipsisVertical } from "lucide-react";
 import { useState } from "react";
 import AssignCourseModal from "./modals/assign-course-modal";
 import ConfirmActionModal from "./modals/confirmation-action-modal";
+import { useSearchParams } from "react-router";
 
 export default function Users() {
-  const { data: users, isLoading } = useQuery({
-    queryKey: ["users"],
-    queryFn: () => userService.getAllUsers(),
-  });
-
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [actionType, setActionType] = useState<
     "activate" | "deactivate" | null
   >(null);
+
+  const [searchParams] = useSearchParams();
+
+  const page = parseInt(searchParams.get("page") || "1", 10);
+  const limit = parseInt(searchParams.get("limit") || "10", 10);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["users", page, limit],
+    queryFn: () => userService.getAllUsers({ page, limit }),
+  });
+
+  const users = data?.users || [];
+  const meta = data?.meta || {
+    currentPage: 0,
+    totalPages: 1,
+    hasNextPage: false,
+    hasPreviousPage: false,
+    pageSize: 10,
+    total: 0,
+  };
 
   const handleAssignCourse = (user: User) => {
     setSelectedUser(user);
@@ -81,6 +97,18 @@ export default function Users() {
       ),
     },
     {
+      header: "Role",
+      render: (row: User) => (
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-semibold ${
+            row.role === "admin" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"
+          }`}
+        >
+          {row.role === "admin" ? "Admin" : "User"}
+        </span>
+      ),
+    },
+    {
       header: "Actions",
       render: (row: User) => (
         <DropdownMenu>
@@ -124,6 +152,7 @@ export default function Users() {
         data={users || []}
         isLoading={isLoading}
         noDataMessage="No users found."
+        pagination={meta}
       />
       <AssignCourseModal
         isOpen={isModalOpen}

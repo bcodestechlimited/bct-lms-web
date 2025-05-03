@@ -1,10 +1,18 @@
 import apiClient from "@/lib/api-client";
 
+interface PaginationParams {
+  page?: number;
+  limit?: number;
+}
+
 class UserService {
-  async getAllUsers() {
+  async getAllUsers({ page = 1, limit = 10 }: PaginationParams) {
     try {
-      const { data } = await apiClient.get(`/users`);
-      return data.responseObject.users;
+      const { data } = await apiClient.get(`/users`, {
+        params: { page, limit },
+      });
+
+      return data.responseObject;
     } catch (error) {
       console.error("Error fetching users:", error);
       throw error;

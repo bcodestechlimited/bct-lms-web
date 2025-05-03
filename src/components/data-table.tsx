@@ -21,11 +21,12 @@ interface TableProps<T> {
   isLoading?: boolean;
   noDataMessage?: string;
   pagination?: {
-    totalCount: number;
-    filteredCount: number;
+    currentPage: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    pageSize: number;
+    total: number;
     totalPages: number;
-    limit: number;
-    page: number;
   };
 }
 

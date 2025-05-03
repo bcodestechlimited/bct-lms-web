@@ -36,6 +36,7 @@ export default function ConfirmActionModal({
       toast.success("User activated successfully!");
       queryClient.invalidateQueries({ queryKey: ["users"] });
       changeActionType(actionType === "activate" ? "deactivate" : "activate");
+      onClose();
     },
     onError: () => toast.error("Failed to activate user"),
   });
@@ -46,6 +47,7 @@ export default function ConfirmActionModal({
       toast.success("User deactivated successfully!");
       queryClient.invalidateQueries({ queryKey: ["users"] });
       changeActionType(actionType === "activate" ? "deactivate" : "activate");
+      onClose();
     },
     onError: () => toast.error("Failed to deactivate user"),
   });
