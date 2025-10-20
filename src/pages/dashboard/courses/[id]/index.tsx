@@ -41,6 +41,16 @@ export default function CourseDetail() {
     }
   }, [course]);
 
+  const getEmbedUrl = (url: string | undefined) => {
+    if (!url) return "";
+    // Match Google Drive file link pattern
+    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (match) {
+      return `https://drive.google.com/file/d/${match[1]}/preview`;
+    }
+    return url; // fallback if it’s not a Drive link
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -73,14 +83,14 @@ export default function CourseDetail() {
   // console.log(course);
 
   return (
-    <div className="flex gap-6 flex-col lg:flex-row w-full h-screen">
+    <div className="grid lg:grid-cols-2 gap-6 flex-col lg:flex-row w-full h-screen">
       {/* Video Section */}
-      <div className="lg:w-2/3">
+      <div className="">
         <h2 className="text-xl font-bold mb-2">Title: {selectedVideo?.name}</h2>
         <div className="aspect-video">
           <iframe
             className="w-full h-full"
-            src={selectedVideo?.content}
+            src={getEmbedUrl(selectedVideo?.content)}
             allowFullScreen
           ></iframe>
         </div>
@@ -90,42 +100,44 @@ export default function CourseDetail() {
       </div>
 
       {/* Modules Section */}
-      <div className="lg:w-1/3 lg:pt-10">
+      <div className="lg:pt-10 h-full ">
         <h2 className="text-lg font-bold mb-2">Modules</h2>
-        <Accordion
-          type="single"
-          collapsible
-          className="w-full"
-          defaultValue={course.course_modules[0].title}
-          onValueChange={(value) => {
-            console.log(value);
-          }}
-        >
-          {course.course_modules.map((module: Module) => {
-            return (
-              <AccordionItem value={module.title} key={module._id}>
-                <AccordionTrigger className="capitalize">
-                  {module.title}
-                </AccordionTrigger>
-                {module.lessons.map((lesson: Lesson) => {
-                  return (
-                    <AccordionContent
-                      key={lesson._id}
-                      className={cn(
-                        `divide-y-2 w-full flex underline text-blue-500 cursor-pointer`,
-                        selectedVideo?._id === lesson._id && "text-purple-500"
-                      )}
-                      onClick={() => setSelectedVideo(lesson)}
-                    >
-                      <span className="font-bold">{lesson.name}</span> :{" "}
-                      {lesson.duration}
-                    </AccordionContent>
-                  );
-                })}
-              </AccordionItem>
-            );
-          })}
-        </Accordion>
+        <div className="lg:max-h-[75vh] overflow-y-scroll">
+          <Accordion
+            type="single"
+            collapsible
+            className="w-full"
+            defaultValue={course.course_modules[0].title}
+            onValueChange={(value) => {
+              console.log(value);
+            }}
+          >
+            {course.course_modules.map((module: Module) => {
+              return (
+                <AccordionItem value={module.title} key={module._id}>
+                  <AccordionTrigger className="capitalize">
+                    {module.title}
+                  </AccordionTrigger>
+                  {module.lessons.map((lesson: Lesson) => {
+                    return (
+                      <AccordionContent
+                        key={lesson._id}
+                        className={cn(
+                          `divide-y-2 w-full flex underline text-blue-500 cursor-pointer`,
+                          selectedVideo?._id === lesson._id && "text-purple-500"
+                        )}
+                        onClick={() => setSelectedVideo(lesson)}
+                      >
+                        <span className="font-bold">{lesson.name}</span> :{" "}
+                        {lesson.duration}
+                      </AccordionContent>
+                    );
+                  })}
+                </AccordionItem>
+              );
+            })}
+          </Accordion>
+        </div>
       </div>
     </div>
   );
