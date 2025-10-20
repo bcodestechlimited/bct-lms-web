@@ -46,7 +46,7 @@ export default function CourseDetail() {
     // Match Google Drive file link pattern
     const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
     if (match) {
-      return `https://drive.google.com/file/d/${match[1]}/preview`;
+      return `https://drive.google.com/file/d/${match[1]}/preview?usp=drivesdk`;
     }
     return url; // fallback if it’s not a Drive link
   };
