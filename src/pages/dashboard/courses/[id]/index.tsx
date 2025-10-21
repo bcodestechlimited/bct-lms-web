@@ -46,10 +46,12 @@ export default function CourseDetail() {
     // Match Google Drive file link pattern
     const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
     if (match) {
-      return `https://drive.google.com/file/d/${match[1]}/preview?usp=drivesdk`;
+      return `https://drive.google.com/file/d/${match[1]}/preview`;
     }
     return url; // fallback if it’s not a Drive link
   };
+
+  console.log({ course });
 
   if (isLoading) {
     return (
@@ -101,7 +103,10 @@ export default function CourseDetail() {
 
       {/* Modules Section */}
       <div className="lg:pt-10 h-full ">
-        <h2 className="text-lg font-bold mb-2">Modules</h2>
+        <h2 className="text-lg font-bold mb-2">
+          {" "}
+          {course?.course_title} - Modules
+        </h2>
         <div className="lg:max-h-[75vh] overflow-y-scroll">
           <Accordion
             type="single"
